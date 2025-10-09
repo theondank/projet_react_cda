@@ -1,15 +1,33 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Compte() {
   const [formData, setFormData] = useState({
-    nom: "Jean Dupont",
-    email: "jean.dupont@example.com",
+    nom: "",
+    email: "",
     motDePasse: "",
-    nombreRecettes: 4,
   });
+
+  // 🔹 Fetch au montage du composant
+  useEffect(() => {
+    fetch("http://localhost:3000/user") // 🔸 endpoint à adapter à ton API
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erreur réseau");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setFormData({
+          nom: data.nom || "",
+          email: data.email || "",
+          motDePasse: "",
+        });
+      })
+      .catch((error) => console.error("❌ Erreur :", error));
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,8 +35,8 @@ export default function Compte() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("✅ Données modifiées :", formData);
-    // ici tu pourrais appeler Appwrite pour mettre à jour les infos utilisateur
+    console.log("✅ Données envoyées :", formData);
+    // tu pourrais faire ici un fetch PUT / PATCH pour enregistrer
   };
 
   return (
@@ -43,7 +61,6 @@ export default function Compte() {
                 value={formData.nom}
                 onChange={handleChange}
                 placeholder="Entrez votre nom"
-                className="w-full"
               />
             </div>
 
@@ -58,7 +75,6 @@ export default function Compte() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="exemple@domaine.com"
-                className="w-full"
               />
             </div>
 
@@ -73,11 +89,9 @@ export default function Compte() {
                 value={formData.motDePasse}
                 onChange={handleChange}
                 placeholder="********"
-                className="w-full"
               />
             </div>
 
-            {/* Bouton enregistrer */}
             <Button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
