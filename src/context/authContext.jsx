@@ -77,12 +77,3 @@
 // };
 
 // export default App;
-
-export const  AuthContext = ({ children }) => {
-    const [loggedInUser, setLoggedInUser] = useState(null);
-    const [email, setEmail ] = useState("");
-
-    useEffect(() => {
-        
-    })
-
