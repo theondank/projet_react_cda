@@ -77,3 +77,32 @@
 // };
 
 // export default App;
+
+import React, { createContext, useState } from "react";
+import { account } from "../lib/appwrite";
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+    const [loggedInUser, setLoggedInUser] = useState(null);
+    const [email, setEmail] = useState("");
+
+    async function login (email, password) {
+        if (!email || !password) {
+            throw new Error("Un email et un mot de passe sont requis.");
+        }
+        try {
+            await account.createEmailPasswordSession(email,password);
+            setLoggedInUser(await account.get());
+        } catch (error) {
+            console.error("Erreur lors de la connexion :", error);
+            throw error;
+        }
+    }
+
+    return (
+        <AuthContext.Provider value={{ loggedInUser, setLoggedInUser, email, setEmail }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
