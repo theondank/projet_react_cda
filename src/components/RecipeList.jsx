@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRecipes } from "../context/recipeContext";
+import RecipeIngredients from "./recipeIngredients";
 
 const RecipeList = () => {
   const { recipes, loading, error, refresh } = useRecipes();
@@ -78,6 +79,16 @@ const RecipeList = () => {
             <p className="text-gray-700 text-sm leading-relaxed">
               {recipe.description}
             </p>
+
+            <p className="text-gray-700 text-sm leading-relaxed">
+              Étapes de préparation: {recipe.etapesPreparation}
+            </p>
+
+            <p className="text-gray-700 text-sm leading-relaxed">
+              Prix: {recipe.prix} €
+            </p>
+
+            <RecipeIngredients recipeId={recipe.id} />
 
             <div className="mt-4 pt-4 border-t border-gray-100">
               <p className="text-xs text-gray-400">
