@@ -49,7 +49,7 @@ const RecipeList = () => {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
-          Mes Recettes Riz-Setter
+          Recettes Riz-Setter
         </h1>
         <button
           onClick={refresh}
@@ -59,7 +59,7 @@ const RecipeList = () => {
         </button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1">
         {recipes.map((recipe) => (
           <div
             key={recipe.id}
