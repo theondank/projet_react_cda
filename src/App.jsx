@@ -1,14 +1,11 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import RecipeList from "./components/recipeList";
+import SidebarLayout from "./components/sidebarLayout";
+import { RecipeProvider } from "./context/recipeContext";
 
 function App() {
   return (
-    <>
-      <RecipeList />
+    <RecipeProvider>
       <SidebarLayout />
-    </>
+    </RecipeProvider>
   );
 }
 
