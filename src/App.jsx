@@ -1,4 +1,4 @@
-import SidebarLayout from "./components/sidebarLayout";
+import SidebarLayout from "./components/sideBarLayout";
 import { LoginForm } from "./components/login-form";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { Routes, Route } from "react-router-dom";
@@ -15,6 +15,3 @@ function App() {
 }
 
 export default App;
-<AuthLayout>
-  <LoginForm />
-</AuthLayout>;

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // ✅ import du Link
-import RecipeForm from "./RecipeForm";
+import RecipeForm from "./recipeForm";
 import { Button } from "./ui/button";
-import RecipeList from "./RecipeList";
+import RecipeList from "./recipeList";
 
 export default function SidebarLayout() {
   const [showForm, setShowForm] = useState(false);
@@ -51,9 +51,12 @@ export default function SidebarLayout() {
 
       {/* === CONTENU PRINCIPAL === */}
       <main className="flex-1 p-8 overflow-y-auto">
-        {showForm && (
+        {showForm ? (
           <div className="max-w-lg mx-auto">
             <RecipeForm />
+          </div>
+        ) : (
+          <div className="max-w-lg mx-auto">
             <RecipeList />
           </div>
         )}
