@@ -56,7 +56,7 @@ export default function SidebarLayout() {
             <RecipeForm />
           </div>
         ) : (
-          <div className="max-w-lg mx-auto">
+          <div className="max-w">
             <RecipeList />
           </div>
         )}
