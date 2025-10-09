@@ -1,4 +1,5 @@
 import React from "react";
+import RecipeList from "../components/RecipeList";
 
 export default function SidebarLayout() {
   return (
@@ -48,10 +49,7 @@ export default function SidebarLayout() {
 
       {/* Contenu principal */}
       <main className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-4">Bienvenue 👋</h1>
-        <p className="text-gray-700">
-          Ici s’affichera le contenu principal de ton application de recettes.
-        </p>
+        <RecipeList />
       </main>
     </div>
   );
