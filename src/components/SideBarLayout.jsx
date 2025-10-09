@@ -19,6 +19,12 @@ export default function SidebarLayout() {
         {/* === Menu === */}
         <nav className="flex-1 p-4 space-y-2">
           <Link
+            to="/homepage"
+            className="block px-4 py-2 rounded hover:bg-gray-800 transition"
+          >
+            Home
+          </Link>
+          <Link
             to="/mesrecettes"
             className="block px-4 py-2 rounded hover:bg-gray-800 transition"
           >
