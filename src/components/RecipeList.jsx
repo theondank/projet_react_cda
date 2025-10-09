@@ -1,70 +1,100 @@
-// // Exemple d'utilisation du RecipeContext dans un composant
+import React from "react";
+import { useRecipes } from "../context/recipeContext";
 
-// import React, { useContext } from "react";
-// import { Recipe } from "../context/recipeContext";
+const RecipeList = () => {
+  const { recipes, loading, error, refresh } = useRecipes();
 
-// const RecipeList = () => {
-//   const {
-//     filteredRecipes,
-//     loading,
-//     error,
-//     searchTerm,
-//     setSearchTerm,
-//     createRecipe,
-//     updateRecipe,
-//     deleteRecipe,
-//   } = useContext(Recipe);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-lg">Chargement des recettes...</div>
+      </div>
+    );
+  }
 
-//   if (loading) {
-//     return <div>Chargement des recettes...</div>;
-//   }
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-4 m-4">
+        <div className="flex">
+          <div className="text-red-800">
+            <h3 className="font-medium">Erreur</h3>
+            <p className="mt-1 text-sm">{error}</p>
+            <button
+              onClick={refresh}
+              className="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-//   if (error) {
-//     return <div>Erreur: {error}</div>;
-//   }
+  if (recipes.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-gray-500">Aucune recette trouvée</p>
+        <button
+          onClick={refresh}
+          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Actualiser
+        </button>
+      </div>
+    );
+  }
 
-//   const handleCreateRecipe = async () => {
-//     const newRecipe = {
-//       title: "Nouvelle recette",
-//       description: "Description de la recette",
-//       ingredients: ["Ingrédient 1", "Ingrédient 2"],
-//       instructions: "Instructions de préparation",
-//       cookingTime: 30,
-//       servings: 4,
-//     };
+  return (
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Mes Recettes Riz-Setter
+        </h1>
+        <button
+          onClick={refresh}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+        >
+          Actualiser
+        </button>
+      </div>
 
-//     await createRecipe(newRecipe);
-//   };
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {recipes.map((recipe) => (
+          <div
+            key={recipe.id}
+            className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+          >
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              {recipe.nom}
+            </h2>
 
-//   return (
-//     <div>
-//       <input
-//         type="text"
-//         placeholder="Rechercher une recette..."
-//         value={searchTerm}
-//         onChange={(e) => setSearchTerm(e.target.value)}
-//       />
+            <div className="text-sm text-gray-600 mb-3">
+              <span className="inline-flex items-center">
+                ⏱️ Temps: {recipe.temps} minutes
+              </span>
+            </div>
 
-//       <button onClick={handleCreateRecipe}>Ajouter une recette</button>
+            <p className="text-gray-700 text-sm leading-relaxed">
+              {recipe.description}
+            </p>
 
-//       <div>
-//         {filteredRecipes.map((recipe) => (
-//           <div key={recipe.$id}>
-//             <h3>{recipe.title}</h3>
-//             <p>{recipe.description}</p>
-//             <button
-//               onClick={() =>
-//                 updateRecipe(recipe.$id, { ...recipe, title: "Titre modifié" })
-//               }
-//             >
-//               Modifier
-//             </button>
-//             <button onClick={() => deleteRecipe(recipe.$id)}>Supprimer</button>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                Créé le:{" "}
+                {new Date(recipe.createdAt).toLocaleDateString("fr-FR")}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 text-center text-sm text-gray-500">
+        {recipes.length} recette{recipes.length > 1 ? "s" : ""} trouvée
+        {recipes.length > 1 ? "s" : ""}
+      </div>
+    </div>
+  );
+};
 
 // export default RecipeList;
