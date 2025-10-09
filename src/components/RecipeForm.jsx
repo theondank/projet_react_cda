@@ -11,7 +11,6 @@ export default function RecipeForm({ onAddRecipe }) {
     e.preventDefault();
     const newRecipe = { title, description, ingredients, steps, image };
     onAddRecipe(newRecipe);
-    // réinitialise le formulaire
     setTitle("");
     setDescription("");
     setIngredients("");
