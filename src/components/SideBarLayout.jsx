@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
+import { PageProvider, usePageContext } from "../context/pageContext";
 import { Link } from "react-router-dom"; // ✅ import du Link
 import RecipeForm from "./recipeForm";
 import { Button } from "./ui/button";
@@ -7,6 +9,15 @@ import RecipeList from "./recipeList";
 export default function SidebarLayout() {
   const [showForm, setShowForm] = useState(false);
 
+  return (
+    <PageProvider>
+      <LayoutContent showForm={showForm} setShowForm={setShowForm} />
+    </PageProvider>
+  );
+}
+
+function LayoutContent({ showForm, setShowForm }) {
+  const { isHomepage } = usePageContext();
   return (
     <div className="flex h-screen bg-gray-100">
       {/* === SIDEBAR === */}
@@ -40,15 +51,12 @@ export default function SidebarLayout() {
 
         {/* === Bas de la sidebar === */}
         <div className="p-4 border-t border-gray-700 space-y-3">
-          {/* Bouton pour afficher/masquer le formulaire */}
           <Button
             onClick={() => setShowForm(!showForm)}
             className="w-full bg-green-600 hover:bg-green-700 text-white rounded"
           >
             {showForm ? "Fermer le formulaire" : "Ajouter une recette 🍳"}
           </Button>
-
-          {/* Bouton de déconnexion */}
           <button className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition">
             Déconnexion
           </button>
@@ -57,15 +65,7 @@ export default function SidebarLayout() {
 
       {/* === CONTENU PRINCIPAL === */}
       <main className="flex-1 p-8 overflow-y-auto">
-        {showForm ? (
-          <div className="max-w-lg mx-auto">
-            <RecipeForm />
-          </div>
-        ) : (
-          <div className="max-w">
-            <RecipeList />
-          </div>
-        )}
+        <Outlet />
       </main>
     </div>
   );
