@@ -4,6 +4,7 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/protectedRoute";
 
+
 function App() {
   return (
     <Routes>
