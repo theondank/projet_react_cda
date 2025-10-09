@@ -1,108 +1,71 @@
-// import React, { useState } from "react";
-// import { account, ID } from "./lib/appwrite";
-
-// const App = () => {
-//   const [loggedInUser, setLoggedInUser] = useState(null);
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [name, setName] = useState("");
-
-//   async function login(email, password) {
-//     await account.createEmailPasswordSession({
-//       email,
-//       password,
-//     });
-//     setLoggedInUser(await account.get());
-//   }
-
-//   return (
-//     <div>
-//       <p>
-//         {loggedInUser ? `Logged in as ${loggedInUser.name}` : "Not logged in"}
-//       </p>
-
-//       <form>
-//         <input
-//           type="email"
-//           placeholder="Email"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//         />
-//         <input
-//           type="password"
-//           placeholder="Password"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//         />
-//         <input
-//           type="text"
-//           placeholder="Name"
-//           value={name}
-//           onChange={(e) => setName(e.target.value)}
-//         />
-
-//         <button type="button" onClick={() => login(email, password)}>
-//           Login
-//         </button>
-
-//         <button
-//           type="button"
-//           onClick={async () => {
-//             await account.create({
-//               userId: ID.unique(),
-//               email,
-//               password,
-//               name,
-//             });
-//             login(email, password);
-//           }}
-//         >
-//           Register
-//         </button>
-
-//         <button
-//           type="button"
-//           onClick={async () => {
-//             await account.deleteSession({
-//               sessionId: "current",
-//             });
-//             setLoggedInUser(null);
-//           }}
-//         >
-//           Logout
-//         </button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default App;
-
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { account } from "../lib/appwrite";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [loggedInUser, setLoggedInUser] = useState(null);
-    const [email, setEmail] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-    async function login (email, password) {
-        if (!email || !password) {
-            throw new Error("Un email et un mot de passe sont requis.");
-        }
-        try {
-            await account.createEmailPasswordSession(email,password);
-            setLoggedInUser(await account.get());
-        } catch (error) {
-            console.error("Erreur lors de la connexion :", error);
-            throw error;
-        }
+  // Vérifier si l'utilisateur est déjà connecté au chargement
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await account.get();
+        setLoggedInUser(user);
+      } catch (error) {
+        // L'utilisateur n'est pas connecté, c'est normal
+        setLoggedInUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  async function login(email, password) {
+    if (!email || !password) {
+      throw new Error("Un email et un mot de passe sont requis.");
     }
+    try {
+      // D'abord, s'assurer qu'aucune session n'est active
+      try {
+        await account.deleteSession("current");
+      } catch (error) {
+        // Pas de session active, c'est normal
+      }
 
-    return (
-        <AuthContext.Provider value={{ loggedInUser, setLoggedInUser, email, setEmail }}>
-            {children}
-        </AuthContext.Provider>
-    );
+      // Créer une nouvelle session
+      await account.createEmailPasswordSession(email, password);
+      const user = await account.get();
+      setLoggedInUser(user);
+      return user;
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error);
+      throw error;
+    }
+  }
+
+  async function logout() {
+    try {
+      await account.deleteSession("current");
+      setLoggedInUser(null);
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+      throw error;
+    }
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        loggedInUser,
+        login,
+        logout,
+        isLoading,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
