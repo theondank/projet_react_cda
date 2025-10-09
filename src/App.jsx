@@ -8,10 +8,10 @@ function App() {
   return (
     <Routes>
       <Route element={<AuthLayout />}>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/homepage" element={<SidebarLayout />} />
-        </Route>
         <Route path="/" element={<LoginForm />} />
+      </Route>
+      <Route element={<ProtectedRoute />}>
+        <Route path="/homepage" element={<SidebarLayout />} />
       </Route>
     </Routes>
   );
