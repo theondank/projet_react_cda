@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/protectedRoute";
 import RecipeList from "./components/RecipeList";
 
+
 function App() {
   return (
     <Routes>

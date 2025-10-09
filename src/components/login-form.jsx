@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import {
@@ -8,10 +9,45 @@ import {
   FieldSeparator,
 } from "./ui/field";
 import { Input } from "./ui/input";
+import { useState } from "react";
+import { AuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm({ className, ...props }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    try {
+      await login(email, password);
+      // Redirection gérée par AuthLayout
+    } catch (err) {
+      console.error("Erreur de connexion:", err);
+      setError("Échec de la connexion. Veuillez vérifier vos identifiants.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
   return (
     <form
+      onSubmit={handleSubmit}
       className={cn(
         "flex flex-col gap-6 w-full max-w-md mx-auto p-8 bg-card rounded-xl shadow-lg border border-border/50 backdrop-blur-sm",
         className
@@ -35,6 +71,9 @@ export function LoginForm({ className, ...props }) {
             id="email"
             type="email"
             placeholder="votre.email@example.com"
+            value={email}
+            onChange={handleEmailChange}
+            disabled={isLoading}
             required
             className="transition-all duration-200 focus:scale-[1.01] focus:shadow-md"
           />
@@ -54,16 +93,24 @@ export function LoginForm({ className, ...props }) {
           <Input
             id="password"
             type="password"
+            onChange={handlePasswordChange}
+            value={password}
+            disabled={isLoading}
             required
             className="transition-all duration-200 focus:scale-[1.01] focus:shadow-md"
           />
         </Field>
+        {error && (
+          <div className="text-red-500 text-sm text-center py-2 bg-red-50 border border-red-200 rounded-md">
+            {error}
+          </div>
+        )}
         <Field>
           <Button
             type="submit"
             className="w-full mt-2 py-6 font-semibold text-base transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
           >
-            Se connecter
+            {isLoading ? "Connexion..." : "Se connecter"}
           </Button>
         </Field>
         <FieldDescription className="text-center mt-6 text-sm">
