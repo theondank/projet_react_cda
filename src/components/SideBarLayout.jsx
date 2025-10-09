@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom"; // ✅ import du Link
 import RecipeForm from "./RecipeForm";
 import { Button } from "./ui/button";
+import RecipeList from "./RecipeList";
 
 export default function SidebarLayout() {
   const [showForm, setShowForm] = useState(false);
@@ -53,6 +54,7 @@ export default function SidebarLayout() {
         {showForm && (
           <div className="max-w-lg mx-auto">
             <RecipeForm />
+            <RecipeList />
           </div>
         )}
       </main>
