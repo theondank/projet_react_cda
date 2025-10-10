@@ -12,6 +12,7 @@ function App() {
     <Routes>
       <Route element={<AuthLayout />}>
         <Route path="/" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<SidebarLayout />}>

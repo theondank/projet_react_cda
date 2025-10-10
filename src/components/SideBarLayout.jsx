@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { PageProvider, usePageContext } from "../context/pageContext";
-import { Link } from "react-router-dom"; // ✅ import du Link
+import { Link } from "react-router-dom";
 import RecipeForm from "./recipeForm";
 import { Button } from "./ui/button";
 import RecipeList from "./recipeList";
+import { useContext } from "react";
+import { AuthContext } from "../context/authContext";
 
 export default function SidebarLayout() {
   const [showForm, setShowForm] = useState(false);
@@ -18,6 +20,7 @@ export default function SidebarLayout() {
 
 function LayoutContent({ showForm, setShowForm }) {
   const { isHomepage } = usePageContext();
+  const { logout } = useContext(AuthContext);
   return (
     <div className="flex h-screen bg-gray-100">
       {/* === SIDEBAR === */}
@@ -55,7 +58,16 @@ function LayoutContent({ showForm, setShowForm }) {
         </nav>
 
         <div className="p-4 border-t border-gray-700 space-y-3">
-          <button className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition">
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            className="w-full bg-green-600 hover:bg-green-700 text-white rounded"
+          >
+            {showForm ? "Fermer le formulaire" : "Ajouter une recette 🍳"}
+          </Button>
+          <button
+            onClick={logout}
+            className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition"
+          >
             Déconnexion
           </button>
         </div>
