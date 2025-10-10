@@ -29,10 +29,10 @@ const RecipeIngredients = ({ recipeId }) => {
   }, [showIngredients]);
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 mb-2">
       <button
         onClick={() => setShowIngredients(!showIngredients)}
-        className="hover:text-neutral-700 text-sm font-medium flex items-center"
+        className="text-gray-700 hover:text-gray-900 text-sm font-medium flex items-center"
       >
         {showIngredients ? "🔽" : "▶️"} Ingrédients
       </button>
@@ -45,8 +45,11 @@ const RecipeIngredients = ({ recipeId }) => {
             </p>
           ) : ingredients.length > 0 ? (
             <ul className="space-y-1">
-              {ingredients.map((ingredient) => (
-                <li key={ingredient.id} className="text-sm text-gray-700">
+              {ingredients.map((ingredient, index) => (
+                <li
+                  key={ingredient.id || ingredient.$id || `ingredient-${index}`}
+                  className="text-sm text-gray-700"
+                >
                   <span className="font-medium">{ingredient.nom}</span>
                   {ingredient.quantite && ingredient.uniteDeMesure && (
                     <span className="text-gray-500">

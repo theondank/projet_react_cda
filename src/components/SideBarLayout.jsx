@@ -27,7 +27,6 @@ function LayoutContent({ showForm, setShowForm }) {
           🍳 Riz-Setter
         </div>
 
-        {/* === Menu === */}
         <nav className="flex-1 p-4 space-y-2">
           <Link
             to="/homepage"
@@ -47,23 +46,21 @@ function LayoutContent({ showForm, setShowForm }) {
           >
             Compte
           </Link>
+          <Link
+            to="/nouvelle-recette"
+            className="block px-4 py-2 rounded hover:bg-gray-800 transition"
+          >
+            Nouvelle recettee
+          </Link>
         </nav>
 
-        {/* === Bas de la sidebar === */}
         <div className="p-4 border-t border-gray-700 space-y-3">
-          <Button
-            onClick={() => setShowForm(!showForm)}
-            className="w-full bg-green-600 hover:bg-green-700 text-white rounded"
-          >
-            {showForm ? "Fermer le formulaire" : "Ajouter une recette 🍳"}
-          </Button>
           <button className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition">
             Déconnexion
           </button>
         </div>
       </aside>
 
-      {/* === CONTENU PRINCIPAL === */}
       <main className="flex-1 p-8 overflow-y-auto">
         <Outlet />
       </main>

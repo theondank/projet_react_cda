@@ -5,7 +5,7 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/protectedRoute";
 import RecipeList from "./components/RecipeList";
-
+import RecipeForm from "./components/recipeForm";
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
         <Route element={<SidebarLayout />}>
           <Route path="/homepage" element={<RecipeList />} />
           <Route path="/compte" element={<Compte />} />
+          <Route path="/nouvelle-recette" element={<RecipeForm />} />
         </Route>
       </Route>
     </Routes>
