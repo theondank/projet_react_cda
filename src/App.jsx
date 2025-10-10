@@ -7,6 +7,7 @@ import { ProtectedRoute } from "./components/protectedRoute";
 import RecipeList from "./components/RecipeList";
 import RecipeForm from "./components/recipeForm";
 import { RegisterForm } from "./components/register-form";
+import MesRecettes from "./components/mesRecettes";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<SidebarLayout />}>
           <Route path="/homepage" element={<RecipeList />} />
+          <Route path="/mesrecettes" element={<MesRecettes />} />
           <Route path="/compte" element={<Compte />} />
           <Route path="/nouvelle-recette" element={<RecipeForm />} />
         </Route>
