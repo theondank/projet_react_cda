@@ -13,13 +13,14 @@ import { useState } from "react";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 
-export function LoginForm({ className, ...props }) {
+export function RegisterForm({ className, ...props }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [name, setName] = useState("");
 
-  const { login } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -27,8 +28,8 @@ export function LoginForm({ className, ...props }) {
     setIsLoading(true);
     setError("");
     try {
-      await login(email, password);
-      // Redirection gérée par AuthLayout
+      await register(email, password, name);
+      
     } catch (err) {
       console.error("Erreur de connexion:", err);
       setError("Échec de la connexion. Veuillez vérifier vos identifiants.");
@@ -45,6 +46,10 @@ export function LoginForm({ className, ...props }) {
     setPassword(e.target.value);
   };
 
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -57,12 +62,28 @@ export function LoginForm({ className, ...props }) {
       <FieldGroup>
         <div className="flex flex-col items-center gap-2 text-center mb-2">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Se connecter
+            S'inscrire
           </h1>
           <p className="text-muted-foreground text-sm text-balance leading-relaxed">
-            Entrez vos identifiants pour accéder à votre compte
+            Entrez vos identifiants pour créer un compte
           </p>
         </div>
+
+        <Field>
+          <FieldLabel htmlFor="name" className="text-sm font-medium">
+            Nom
+          </FieldLabel>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Votre nom"
+            value={name}
+            onChange={handleNameChange}
+            disabled={isLoading}
+            required
+            className="transition-all duration-200 focus:scale-[1.01] focus:shadow-md"
+          />
+        </Field>
         <Field>
           <FieldLabel htmlFor="email" className="text-sm font-medium">
             Email
@@ -78,17 +99,13 @@ export function LoginForm({ className, ...props }) {
             className="transition-all duration-200 focus:scale-[1.01] focus:shadow-md"
           />
         </Field>
+
         <Field>
           <div className="flex items-center justify-between">
             <FieldLabel htmlFor="password" className="text-sm font-medium">
               Mot de Passe
             </FieldLabel>
-            <a
-              href="#"
-              className="ml-auto text-xs text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-colors duration-200 font-medium"
-            >
-              Mot de passe oublié ?
-            </a>
+           
           </div>
           <Input
             id="password"
@@ -110,18 +127,9 @@ export function LoginForm({ className, ...props }) {
             type="submit"
             className="w-full mt-2 py-6 font-semibold text-base transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
           >
-            {isLoading ? "Connexion..." : "Se connecter"}
+            {isLoading ? "Connexion..." : "S'inscrire"}
           </Button>
         </Field>
-        <FieldDescription className="text-center mt-6 text-sm">
-          Vous n'avez pas de compte ?{" "}
-          <a
-            onClick={() => navigate("/register")}
-            className="text-primary font-semibold hover:text-primary/80 underline underline-offset-4 transition-colors duration-200"
-          >
-            Inscrivez-vous
-          </a>
-        </FieldDescription>
       </FieldGroup>
     </form>
   );

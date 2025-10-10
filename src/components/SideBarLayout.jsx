@@ -5,6 +5,8 @@ import { Link } from "react-router-dom"; // ✅ import du Link
 import RecipeForm from "./recipeForm";
 import { Button } from "./ui/button";
 import RecipeList from "./recipeList";
+import { useContext } from "react";
+import { AuthContext } from "../context/authContext";
 
 export default function SidebarLayout() {
   const [showForm, setShowForm] = useState(false);
@@ -18,6 +20,7 @@ export default function SidebarLayout() {
 
 function LayoutContent({ showForm, setShowForm }) {
   const { isHomepage } = usePageContext();
+  const { logout } = useContext(AuthContext);
   return (
     <div className="flex h-screen bg-gray-100">
       {/* === SIDEBAR === */}
@@ -57,7 +60,7 @@ function LayoutContent({ showForm, setShowForm }) {
           >
             {showForm ? "Fermer le formulaire" : "Ajouter une recette 🍳"}
           </Button>
-          <button className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition">
+          <button onClick={logout} className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition">
             Déconnexion
           </button>
         </div>
