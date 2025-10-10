@@ -23,9 +23,7 @@ function LayoutContent({ showForm, setShowForm }) {
   const { logout } = useContext(AuthContext);
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* === SIDEBAR === */}
       <aside className="w-64 bg-gray-900 text-gray-100 flex flex-col justify-between">
-        {/* Logo / Titre */}
         <div className="p-4 text-2xl font-bold border-b border-gray-700">
           🍳 Riz-Setter
         </div>
@@ -53,17 +51,11 @@ function LayoutContent({ showForm, setShowForm }) {
             to="/nouvelle-recette"
             className="block px-4 py-2 rounded hover:bg-gray-800 transition"
           >
-            Nouvelle recettee
+            Nouvelle recette
           </Link>
         </nav>
 
         <div className="p-4 border-t border-gray-700 space-y-3">
-          <Button
-            onClick={() => setShowForm(!showForm)}
-            className="w-full bg-green-600 hover:bg-green-700 text-white rounded"
-          >
-            {showForm ? "Fermer le formulaire" : "Ajouter une recette 🍳"}
-          </Button>
           <button
             onClick={logout}
             className="w-full bg-red-600 hover:bg-red-700 py-2 rounded transition"

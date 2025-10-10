@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/protectedRoute";
 import RecipeList from "./components/RecipeList";
 import RecipeForm from "./components/recipeForm";
+import { RegisterForm } from "./components/register-form";
 
 function App() {
   return (
