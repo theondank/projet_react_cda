@@ -91,97 +91,200 @@ export default function Compte() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
-      <Card className="w-full max-w-md shadow-lg border-none">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-800 text-center">
-            👤 Mon compte
-          </CardTitle>
-        </CardHeader>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Arrière-plan dégradé culinaire */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50"></div>
 
-        <CardContent>
-          {/* Message de feedback */}
-          {message.text && (
-            <div
-              className={`mb-4 p-3 rounded ${
-                message.type === "success"
-                  ? "bg-green-100 text-green-700 border border-green-300"
-                  : "bg-red-100 text-red-700 border border-red-300"
-              }`}
-            >
-              {message.text}
-            </div>
-          )}
+      {/* Éléments décoratifs en arrière-plan */}
+      <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-20 -right-20 w-32 h-32 bg-blue-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="absolute top-1/4 right-20 w-24 h-24 bg-indigo-200/20 rounded-full blur-2xl animate-pulse delay-500"></div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Nom */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Nom complet
-              </label>
-              <Input
-                type="text"
-                name="nom"
-                value={formData.nom}
-                onChange={handleChange}
-                placeholder={loggedInUser?.name || "Entrez votre nom"}
-              />
-            </div>
+      {/* Icônes culinaires flottantes */}
+      <div className="absolute top-20 left-1/4 text-3xl opacity-10 animate-bounce delay-300">
+        🧑‍🍳
+      </div>
+      <div className="absolute top-1/3 right-1/4 text-2xl opacity-10 animate-bounce delay-700">
+        ⚙️
+      </div>
+      <div className="absolute bottom-1/3 left-1/5 text-3xl opacity-10 animate-bounce delay-1100">
+        📝
+      </div>
+      <div className="absolute bottom-20 right-1/5 text-2xl opacity-10 animate-bounce delay-1500">
+        ✨
+      </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Adresse e-mail
-              </label>
-              <Input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder={loggedInUser?.email || "exemple@domaine.com"}
-              />
-            </div>
+      {/* Contenu principal */}
+      <div className="relative z-10 flex justify-center items-center min-h-screen p-6">
+        <div className="relative w-full max-w-lg">
+          {/* Card principale avec effet glassmorphism */}
+          <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-purple-100/50 overflow-hidden">
+            {/* En-tête avec avatar et titre */}
+            <div className="relative bg-gradient-to-r from-purple-500 to-indigo-600 p-8 text-center">
+              {/* Avatar du chef */}
+              <div className="relative inline-block mb-4">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/30">
+                  <span className="text-4xl">👨‍🍳</span>
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white">
+                  <span className="text-sm">⚙️</span>
+                </div>
+              </div>
 
-            {/* Mot de passe actuel */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Mot de passe actuel (requis pour modifier email/mot de passe)
-              </label>
-              <Input
-                type="password"
-                name="motDePasseActuel"
-                value={formData.motDePasseActuel}
-                onChange={handleChange}
-                placeholder="Entrez votre mot de passe actuel"
-              />
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Mon Profil de Chef
+              </h1>
+              <p className="text-purple-100 text-sm">
+                Gérez vos informations personnelles
+              </p>
+
+              {/* Décoration */}
+              <div className="absolute top-4 left-4 text-white/20 text-2xl">
+                🍽️
+              </div>
+              <div className="absolute bottom-4 right-4 text-white/20 text-2xl">
+                🌟
+              </div>
             </div>
 
-            {/* Nouveau mot de passe */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Nouveau mot de passe (laissez vide pour ne pas changer)
-              </label>
-              <Input
-                type="password"
-                name="nouveauMotDePasse"
-                value={formData.nouveauMotDePasse}
-                onChange={handleChange}
-                placeholder="Minimum 8 caractères"
-              />
-            </div>
+            {/* Contenu du formulaire */}
+            <div className="p-8">
+              {/* Message de feedback avec style amélioré */}
+              {message.text && (
+                <div
+                  className={`mb-6 p-4 rounded-xl border-2 text-center font-medium ${
+                    message.type === "success"
+                      ? "bg-green-50/80 text-green-700 border-green-200 backdrop-blur-sm"
+                      : "bg-red-50/80 text-red-700 border-red-200 backdrop-blur-sm"
+                  }`}
+                >
+                  <span className="mr-2">
+                    {message.type === "success" ? "🎉" : "⚠️"}
+                  </span>
+                  {message.text}
+                </div>
+              )}
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 rounded"
-            >
-              {isLoading
-                ? "⏳ Mise à jour..."
-                : "💾 Enregistrer les modifications"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Nom du chef */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <span className="text-purple-500">👤</span>
+                    Nom de Chef
+                  </label>
+                  <Input
+                    type="text"
+                    name="nom"
+                    value={formData.nom}
+                    onChange={handleChange}
+                    placeholder={loggedInUser?.name || "Chef Auguste"}
+                    className="transition-all duration-300 focus:scale-[1.01] focus:shadow-lg focus:border-purple-400 bg-white/70 backdrop-blur-sm border-purple-200/50 rounded-xl p-4"
+                  />
+                </div>
+
+                {/* Email */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <span className="text-purple-500">📧</span>
+                    Adresse e-mail
+                  </label>
+                  <Input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder={loggedInUser?.email || "chef@cuisine.com"}
+                    className="transition-all duration-300 focus:scale-[1.01] focus:shadow-lg focus:border-purple-400 bg-white/70 backdrop-blur-sm border-purple-200/50 rounded-xl p-4"
+                  />
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <span>💡</span>
+                    Le mot de passe actuel sera requis pour modifier l'email
+                  </p>
+                </div>
+
+                {/* Mot de passe actuel */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <span className="text-purple-500">🔐</span>
+                    Mot de passe actuel
+                  </label>
+                  <Input
+                    type="password"
+                    name="motDePasseActuel"
+                    value={formData.motDePasseActuel}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    className="transition-all duration-300 focus:scale-[1.01] focus:shadow-lg focus:border-purple-400 bg-white/70 backdrop-blur-sm border-purple-200/50 rounded-xl p-4"
+                  />
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <span>🔒</span>
+                    Requis pour modifier l'email ou le mot de passe
+                  </p>
+                </div>
+
+                {/* Nouveau mot de passe */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <span className="text-purple-500">🆕</span>
+                    Nouveau mot de passe
+                  </label>
+                  <Input
+                    type="password"
+                    name="nouveauMotDePasse"
+                    value={formData.nouveauMotDePasse}
+                    onChange={handleChange}
+                    placeholder="Minimum 8 caractères"
+                    className="transition-all duration-300 focus:scale-[1.01] focus:shadow-lg focus:border-purple-400 bg-white/70 backdrop-blur-sm border-purple-200/50 rounded-xl p-4"
+                  />
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <span>💡</span>
+                    Laissez vide pour conserver votre mot de passe actuel
+                  </p>
+                </div>
+
+                {/* Bouton de sauvegarde */}
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full mt-8 py-6 font-bold text-base bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <span className="animate-spin text-xl">⚙️</span>
+                      Mise à jour en cours...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-3">
+                      <span className="text-xl">💾</span>
+                      Sauvegarder les modifications
+                    </span>
+                  )}
+                </Button>
+              </form>
+
+              {/* Section informations supplémentaires */}
+              <div className="mt-8 pt-6 border-t border-purple-100">
+                <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <span>🛡️</span>
+                    Sécurisé
+                  </span>
+                  <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                  <span className="flex items-center gap-1">
+                    <span>🔒</span>
+                    Chiffré
+                  </span>
+                  <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                  <span className="flex items-center gap-1">
+                    <span>⚡</span>
+                    Instantané
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
