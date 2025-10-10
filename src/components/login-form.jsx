@@ -28,7 +28,6 @@ export function LoginForm({ className, ...props }) {
     setError("");
     try {
       await login(email, password);
-      // Redirection gérée par AuthLayout
     } catch (err) {
       console.error("Erreur de connexion:", err);
       setError("Échec de la connexion. Veuillez vérifier vos identifiants.");

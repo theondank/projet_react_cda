@@ -2,6 +2,9 @@ import React, { useState, useContext } from "react";
 import { useRecipes } from "../context/recipeContext";
 import { AuthContext } from "../context/authContext";
 import { useParams } from "react-router-dom";
+import { recette }  from "../lib/recette";
+import { useEffect } from "react";
+
 
 // Fonction pour afficher un emoji selon la difficulté
 function getDifficultyEmoji(level) {
@@ -15,6 +18,11 @@ export default function MesRecettes() {
   const [openRecipeId, setOpenRecipeId] = useState(null);
   const { id } = useParams();
 
+ useEffect(() => {
+   recette.listRecettes(loggedInUser.$id);
+ }, []);
+
+console.log(recette.listRecettes(loggedInUser.$id));
   // ✅ Nouveau filtrage : on garde uniquement les recettes créées par l’utilisateur connecté
   const userRecipes = recipes.filter(
     (recipe) => recipe.userId === loggedInUser?.$id
@@ -24,12 +32,12 @@ export default function MesRecettes() {
   console.log("Recettes utilisateur :", userRecipes);
   console.log("ID utilisateur connecté :", loggedInUser?.$id);
 
-  // 🔁 Fonction pour ouvrir / fermer les étapes d'une recette
+ 
   const toggleEtapes = (id) => {
     setOpenRecipeId(openRecipeId === id ? null : id);
   };
 
-  // 🔄 État de chargement
+ 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -38,7 +46,7 @@ export default function MesRecettes() {
     );
   }
 
-  // ⚠️ Gestion des erreurs
+  
   if (error) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -47,7 +55,7 @@ export default function MesRecettes() {
     );
   }
 
-  // 🎨 Rendu principal
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-10 px-4">
       <div className="max-w-5xl mx-auto">
@@ -67,7 +75,7 @@ export default function MesRecettes() {
             </p>
           </div>
         ) : (
-          // 🧁 Affichage des recettes de l’utilisateur connecté
+          
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {userRecipes.map((recipe) => (
               <div

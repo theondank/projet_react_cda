@@ -8,32 +8,33 @@ export const AuthProvider = ({ children }) => {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Vérifier si l'utilisateur est déjà connecté au chargement
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const user = await account.get();
         setLoggedInUser(user);
       } catch (error) {
-        // L'utilisateur n'est pas connecté, c'est normal
+        
         setLoggedInUser(null);
       } finally {
         setIsLoading(false);
       }
     };
     checkAuth();
-  }, []);
+  }, [] );
 
   async function login(email, password) {
+    
+
     if (!email || !password) {
-      throw new Error("Un email et un mot de passe sont requis.");
+      throw Error("Un email et un mot de passe sont requis.");
     }
     try {
-      // D'abord, s'assurer qu'aucune session n'est active
+      
       try {
         await account.deleteSession("current");
       } catch (error) {
-        // Pas de session active, c'est normal
+       throw Error("Erreur lors de la déconnexion de la session actuelle.");
       }
 
       // Créer une nouvelle session
@@ -42,14 +43,13 @@ export const AuthProvider = ({ children }) => {
       setLoggedInUser(user);
       return user;
     } catch (error) {
-      console.error("Erreur lors de la connexion :", error);
-      throw error;
+     throw  Error("Erreur lors de la connexion :", error);
     }
   }
 
   async function register(email, password, name) {
     if (!email || !password || !name) {
-      throw new Error("Un email, un mot de passe et un nom sont requis.");
+      throw Error("Un email, un mot de passe et un nom sont requis.");
     }
     try {
      
@@ -63,18 +63,17 @@ export const AuthProvider = ({ children }) => {
       setLoggedInUser(user);
       return user;
     } catch (error) {
-      console.error("Erreur lors de l'inscription :", error);
-      throw error;
+      throw Error("Erreur lors de l'inscription :", error);
     }
   }
 
   async function logout() {
+    setErrorMessage(null);
     try {
       await account.deleteSession("current");
       setLoggedInUser(null);
     } catch (error) {
-      console.error("Erreur lors de la déconnexion :", error);
-      throw error;
+      throw Error("Erreur lors de la déconnexion :", error);
     }
   }
 
@@ -89,8 +88,8 @@ export const AuthProvider = ({ children }) => {
 
       // Mettre à jour l'email si fourni
       if (data.email && data.email !== loggedInUser?.email) {
-        if (!data.password || data.password.length < 8) {
-          throw new Error(
+        if (!data.password || data.password.length < 8 ) {
+          throw Error(
             "Le mot de passe actuel est requis pour modifier l'email et doit contenir au moins 8 caractères."
           );
         }
@@ -100,10 +99,10 @@ export const AuthProvider = ({ children }) => {
       // Mettre à jour le mot de passe si un nouveau est fourni
       if (data.newPassword) {
         if (!data.password) {
-          throw new Error("Le mot de passe actuel est requis pour le changer.");
+          throw Error("Le mot de passe actuel est requis pour le changer.");
         }
         if (data.newPassword.length < 8) {
-          throw new Error(
+          throw Error(
             "Le nouveau mot de passe doit contenir au moins 8 caractères."
           );
         }
@@ -115,8 +114,7 @@ export const AuthProvider = ({ children }) => {
       setLoggedInUser(refreshedUser);
       return refreshedUser;
     } catch (error) {
-      console.error("Erreur lors de la modification de l'utilisateur :", error);
-      throw error;
+      throw Error("Erreur lors de la modification de l'utilisateur :", error);
     }
   }
 
