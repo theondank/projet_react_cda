@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   async function logout() {
-    setErrorMessage(null);
+    
     try {
       await account.deleteSession("current");
       setLoggedInUser(null);

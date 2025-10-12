@@ -1,11 +1,13 @@
-import { TablesDB, Query } from "appwrite";
+import { Query } from "appwrite";
+import { tablesDB } from "./appwrite";
 
 export const recette = {
-    listRecettes: async (userId) => {
-       return await TablesDB.listRecettes({
-            tableId: import.meta.env.VITE_APPWRITE_TABLE_RECETTES,
-            filters: [`userId=${userId}`],
-            queries: [Query.equal('userId', userId), ]
-       });
-    }
-}
+  listRecettes: async (userId) => {
+    return await tablesDB.listRows({
+      databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID,      
+      tableId: import.meta.env.VITE_APPWRITE_COLLECTION_ID,
+      filters: [`userId=${userId}`],
+      queries: [Query.equal("userId", userId)],
+    });
+  },
+};
