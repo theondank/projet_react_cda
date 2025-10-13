@@ -1,7 +1,7 @@
-import { cn } from "../lib/utils";
+import { cn } from "@utils";
 import { Outlet, Navigate } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../context/authContext";
+import { AuthContext } from "@context/authContext";
 
 export function AuthLayout({ className }) {
   const { loggedInUser, isLoading } = useContext(AuthContext);
