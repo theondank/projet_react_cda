@@ -12,11 +12,15 @@ import {
 } from "@ui/field";
 import { PageCard } from "@ui/page-card";
 import { MainLayout } from "@layouts/MainLayout";
+import { BookOpen, Video, Shield } from "lucide-react";
+import RecipeBasicInfoFields from "./RecipeBasicInfoFields";
+import RecipeStepsEditor from "./RecipeStepsEditor";
+import RecipeIngredientsEditor from "./RecipeIngredientsEditor";
 import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@ui/collapsible";
+  validateAndSanitize,
+  validateNumber,
+  sanitizeUrl,
+} from "@/shared/utils/security";
 
 const RecipeForm = ({ onRecipeCreated }) => {
   const { loggedInUser } = useContext(AuthContext);
@@ -27,8 +31,12 @@ const RecipeForm = ({ onRecipeCreated }) => {
     difficulte: 1,
     prix: "",
     description: "",
-    etapesPreparation: "",
+    videoUrl: "",
   });
+
+  const [recipeSteps, setRecipeSteps] = useState([
+    { id: Date.now(), description: "" },
+  ]);
 
   const [recipeIngredients, setRecipeIngredients] = useState([
     { id: Date.now(), ingredientId: "", quantite: "", uniteDeMesure: "" },
@@ -38,6 +46,7 @@ const RecipeForm = ({ onRecipeCreated }) => {
   const [errors, setErrors] = useState({});
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isIngredientsOpen, setIsIngredientsOpen] = useState(true);
+  const [securityWarnings, setSecurityWarnings] = useState([]);
   useEffect(() => {
     fetchAvailableIngredients();
   }, []);
@@ -62,15 +71,33 @@ const RecipeForm = ({ onRecipeCreated }) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "number"
-          ? parseInt(value) || 0
-          : name === "difficulte"
-          ? parseInt(value) || 1
-          : name === "prix"
-          ? parseFloat(value) || 0
-          : value,
+      [name]: value, // Garde la valeur brute pour permettre la saisie
     }));
+  };
+
+  const handleStepChange = (index, value) => {
+    const updatedSteps = [...recipeSteps];
+    updatedSteps[index] = {
+      ...updatedSteps[index],
+      description: value,
+    };
+    setRecipeSteps(updatedSteps);
+  };
+
+  const addStep = () => {
+    setRecipeSteps((prevSteps) => [
+      ...prevSteps,
+      {
+        id: Date.now() + Math.random(),
+        description: "",
+      },
+    ]);
+  };
+
+  const removeStep = (index) => {
+    if (recipeSteps.length > 1) {
+      setRecipeSteps(recipeSteps.filter((_, i) => i !== index));
+    }
   };
 
   const handleIngredientChange = (index, field, value) => {
@@ -105,27 +132,153 @@ const RecipeForm = ({ onRecipeCreated }) => {
 
   const validateForm = () => {
     const newErrors = {};
+    const warnings = [];
 
-    if (!formData.nom.trim()) newErrors.nom = "Le nom de la recette est requis";
-    if (!formData.temps || formData.temps <= 0)
-      newErrors.temps = "Le temps doit être supérieur à 0";
-    if (formData.difficulte < 1 || formData.difficulte > 5)
-      newErrors.difficulte = "La difficulté doit être entre 1 et 5";
-    if (!formData.prix || formData.prix <= 0)
-      newErrors.prix = "Le prix doit être supérieur à 0";
-    if (!formData.description.trim())
-      newErrors.description = "La description est requise";
-    if (!formData.etapesPreparation.trim())
-      newErrors.etapesPreparation = "Les étapes sont requises";
+    // Validation et sanitization du nom
+    const nomValidation = validateAndSanitize(formData.nom, {
+      minLength: 3,
+      maxLength: 100,
+      fieldName: "Le nom de la recette",
+    });
+    if (!nomValidation.isValid) {
+      newErrors.nom = nomValidation.errors[0];
+      if (
+        nomValidation.errors.some(
+          (e) => e.includes("interdit") || e.includes("dangereux")
+        )
+      ) {
+        warnings.push(...nomValidation.errors);
+      }
+    }
 
+    // Validation du temps
+    const tempsValidation = validateNumber(formData.temps, {
+      min: 1,
+      max: 1440, // Max 24 heures en minutes
+      integer: true,
+      fieldName: "Le temps de préparation",
+    });
+    if (!tempsValidation.isValid) {
+      newErrors.temps = tempsValidation.errors[0];
+    }
+
+    // Validation de la difficulté
+    const difficulteValidation = validateNumber(formData.difficulte, {
+      min: 1,
+      max: 5,
+      integer: true,
+      fieldName: "La difficulté",
+    });
+    if (!difficulteValidation.isValid) {
+      newErrors.difficulte = difficulteValidation.errors[0];
+    }
+
+    // Validation du prix
+    const prixValidation = validateNumber(formData.prix, {
+      min: 0.01,
+      max: 10000,
+      fieldName: "Le prix",
+    });
+    if (!prixValidation.isValid) {
+      newErrors.prix = prixValidation.errors[0];
+    }
+
+    // Validation et sanitization de la description
+    const descriptionValidation = validateAndSanitize(formData.description, {
+      minLength: 10,
+      maxLength: 2000,
+      fieldName: "La description",
+    });
+    if (!descriptionValidation.isValid) {
+      newErrors.description = descriptionValidation.errors[0];
+      if (
+        descriptionValidation.errors.some(
+          (e) => e.includes("interdit") || e.includes("dangereux")
+        )
+      ) {
+        warnings.push(...descriptionValidation.errors);
+      }
+    }
+
+    // Validation de l'URL vidéo (optionnelle)
+    if (formData.videoUrl && formData.videoUrl.trim()) {
+      const urlValidation = validateAndSanitize(formData.videoUrl, {
+        maxLength: 500,
+        allowUrls: true,
+        fieldName: "L'URL de la vidéo",
+      });
+      if (!urlValidation.isValid) {
+        newErrors.videoUrl = urlValidation.errors[0];
+        if (urlValidation.errors.some((e) => e.includes("dangereux"))) {
+          warnings.push(...urlValidation.errors);
+        }
+      }
+    }
+
+    // Validation des étapes
+    const validSteps = recipeSteps.filter((step) => step.description.trim());
+    if (validSteps.length === 0) {
+      newErrors.etapesPreparation = "Au moins une étape est requise";
+    } else {
+      // Valider chaque étape
+      validSteps.forEach((step, index) => {
+        const stepValidation = validateAndSanitize(step.description, {
+          minLength: 5,
+          maxLength: 500,
+          fieldName: `L'étape ${index + 1}`,
+        });
+        if (!stepValidation.isValid) {
+          newErrors[`step_${index}`] = stepValidation.errors[0];
+          if (
+            stepValidation.errors.some(
+              (e) => e.includes("interdit") || e.includes("dangereux")
+            )
+          ) {
+            warnings.push(...stepValidation.errors);
+          }
+        }
+      });
+    }
+
+    // Validation des ingrédients
     const validIngredients = recipeIngredients.filter(
       (ing) => ing.ingredientId && ing.quantite && ing.uniteDeMesure
     );
     if (validIngredients.length === 0) {
       newErrors.ingredients = "Au moins un ingrédient est requis";
+    } else {
+      // Valider chaque ingrédient
+      validIngredients.forEach((ing, index) => {
+        const quantiteValidation = validateNumber(ing.quantite, {
+          min: 0.01,
+          max: 10000,
+          fieldName: `La quantité de l'ingrédient ${index + 1}`,
+        });
+        if (!quantiteValidation.isValid) {
+          newErrors[`ingredient_quantity_${index}`] =
+            quantiteValidation.errors[0];
+        }
+
+        const uniteValidation = validateAndSanitize(ing.uniteDeMesure, {
+          minLength: 1,
+          maxLength: 50,
+          fieldName: `L'unité de mesure de l'ingrédient ${index + 1}`,
+        });
+        if (!uniteValidation.isValid) {
+          newErrors[`ingredient_unit_${index}`] = uniteValidation.errors[0];
+          if (
+            uniteValidation.errors.some(
+              (e) => e.includes("interdit") || e.includes("dangereux")
+            )
+          ) {
+            warnings.push(...uniteValidation.errors);
+          }
+        }
+      });
     }
 
     setErrors(newErrors);
+    setSecurityWarnings(warnings);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -141,15 +294,41 @@ const RecipeForm = ({ onRecipeCreated }) => {
 
     setLoading(true);
     setErrors({});
+    setSecurityWarnings([]);
 
     try {
+      // Sanitization finale de toutes les données avant envoi
+      const nomSanitized = validateAndSanitize(formData.nom, {
+        maxLength: 100,
+      }).sanitized;
+
+      const descriptionSanitized = validateAndSanitize(formData.description, {
+        maxLength: 2000,
+      }).sanitized;
+
+      const videoUrlSanitized = formData.videoUrl.trim()
+        ? sanitizeUrl(formData.videoUrl)
+        : "";
+
+      // Convertir les étapes en une seule chaîne numérotée avec sanitization
+      const validSteps = recipeSteps.filter((step) => step.description.trim());
+      const etapesPreparation = validSteps
+        .map((step, index) => {
+          const sanitized = validateAndSanitize(step.description, {
+            maxLength: 500,
+          }).sanitized;
+          return `${index + 1}. ${sanitized}`;
+        })
+        .join("\n");
+
       const recipeData = {
-        nom: formData.nom.trim(),
+        nom: nomSanitized,
         temps: parseInt(formData.temps) || 0,
         difficulte: parseInt(formData.difficulte) || 1,
         prix: parseFloat(formData.prix) || 0,
-        description: formData.description.trim(),
-        etapesPreparation: formData.etapesPreparation.trim(),
+        description: descriptionSanitized,
+        etapesPreparation: etapesPreparation,
+        videoUrl: videoUrlSanitized,
         userId: loggedInUser.$id,
       };
 
@@ -159,14 +338,19 @@ const RecipeForm = ({ onRecipeCreated }) => {
         (ing) => ing.ingredientId && ing.quantite && ing.uniteDeMesure
       );
 
-      const ingredientPromises = validIngredients.map((ingredient) =>
-        recetteAPI.createRecetteIngredient({
+      const ingredientPromises = validIngredients.map((ingredient) => {
+        // Sanitization de l'unité de mesure
+        const uniteSanitized = validateAndSanitize(ingredient.uniteDeMesure, {
+          maxLength: 50,
+        }).sanitized;
+
+        return recetteAPI.createRecetteIngredient({
           recetteId: recipe.$id,
           ingredientId: ingredient.ingredientId,
-          quantite: ingredient.quantite,
-          uniteDeMesure: ingredient.uniteDeMesure.trim(),
-        })
-      );
+          quantite: parseFloat(ingredient.quantite),
+          uniteDeMesure: uniteSanitized,
+        });
+      });
 
       await Promise.all(ingredientPromises);
 
@@ -177,8 +361,9 @@ const RecipeForm = ({ onRecipeCreated }) => {
         difficulte: 1,
         prix: "",
         description: "",
-        etapesPreparation: "",
+        videoUrl: "",
       });
+      setRecipeSteps([{ id: Date.now(), description: "" }]);
       setRecipeIngredients([
         { id: Date.now(), ingredientId: "", quantite: "", uniteDeMesure: "" },
       ]);
@@ -223,6 +408,26 @@ const RecipeForm = ({ onRecipeCreated }) => {
       icon="🍳"
     >
       <PageCard className="max-w-4xl mx-auto">
+        {/* Avertissement de sécurité */}
+        {securityWarnings.length > 0 && (
+          <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg mb-6">
+            <div className="flex items-start">
+              <Shield className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold mb-1">
+                  ⚠️ Avertissement de sécurité
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {securityWarnings.map((warning, index) => (
+                    <li key={index}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Erreur générale */}
         {errors.general && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             <div className="flex items-center">
@@ -234,97 +439,16 @@ const RecipeForm = ({ onRecipeCreated }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Informations de base */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl">
-            <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
-              <span className="mr-2">📝</span>
-              Informations de base
-            </h3>
-
-            <FieldGroup>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="nom">
-                    <span className="mr-1">🏷️</span>
-                    Nom de la recette *
-                  </FieldLabel>
-                  <Input
-                    id="nom"
-                    name="nom"
-                    value={formData.nom}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Tarte aux pommes"
-                    className="mt-1"
-                  />
-                  <FieldError>{errors.nom}</FieldError>
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="temps">
-                    <span className="mr-1">⏰</span>
-                    Temps (minutes) *
-                  </FieldLabel>
-                  <Input
-                    id="temps"
-                    name="temps"
-                    type="number"
-                    min="1"
-                    value={formData.temps}
-                    onChange={handleInputChange}
-                    placeholder="45"
-                    className="mt-1"
-                  />
-                  <FieldError>{errors.temps}</FieldError>
-                </Field>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="difficulte">
-                    <span className="mr-1">🌶️</span>
-                    Difficulté *
-                  </FieldLabel>
-                  <select
-                    id="difficulte"
-                    name="difficulte"
-                    value={formData.difficulte}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value={1}>🟢 Très facile</option>
-                    <option value={2}>🟡 Facile</option>
-                    <option value={3}>🟠 Modéré</option>
-                    <option value={4}>🔴 Difficile</option>
-                    <option value={5}>🟣 Très difficile</option>
-                  </select>
-                  <FieldError>{errors.difficulte}</FieldError>
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="prix">
-                    <span className="mr-1">💰</span>
-                    Prix (€) *
-                  </FieldLabel>
-                  <Input
-                    id="prix"
-                    name="prix"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.prix}
-                    onChange={handleInputChange}
-                    placeholder="15.50"
-                    className="mt-1"
-                  />
-                  <FieldError>{errors.prix}</FieldError>
-                </Field>
-              </div>
-            </FieldGroup>
-          </div>
+          <RecipeBasicInfoFields
+            formData={formData}
+            errors={errors}
+            onChange={handleInputChange}
+          />
 
           {/* Description et étapes */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl">
-            <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
-              <span className="mr-2">📖</span>
+          <div className="bg-white p-6 rounded-xl border border-neutral-200">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-neutral-800">
+              <BookOpen className="w-5 h-5 text-primary" />
               Description et préparation
             </h3>
 
@@ -338,159 +462,56 @@ const RecipeForm = ({ onRecipeCreated }) => {
                   onChange={handleInputChange}
                   placeholder="Décrivez votre recette..."
                   rows="3"
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                 />
                 <FieldError>{errors.description}</FieldError>
               </Field>
 
+              <RecipeStepsEditor
+                steps={recipeSteps}
+                errors={errors}
+                onChange={handleStepChange}
+                onAdd={addStep}
+                onRemove={removeStep}
+              />
+
               <Field>
-                <FieldLabel htmlFor="etapesPreparation">
-                  Étapes de préparation *
+                <FieldLabel
+                  htmlFor="videoUrl"
+                  className="flex items-center gap-1"
+                >
+                  <Video className="w-4 h-4" />
+                  URL Vidéo YouTube (optionnelle)
                 </FieldLabel>
-                <textarea
-                  id="etapesPreparation"
-                  name="etapesPreparation"
-                  value={formData.etapesPreparation}
+                <Input
+                  id="videoUrl"
+                  name="videoUrl"
+                  type="url"
+                  value={formData.videoUrl}
                   onChange={handleInputChange}
-                  placeholder="1. Préchauffer le four...&#10;2. Mélanger..."
-                  rows="4"
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="mt-1"
                 />
-                <FieldError>{errors.etapesPreparation}</FieldError>
+                <FieldDescription>
+                  Ajoutez un lien YouTube pour montrer votre recette en vidéo
+                </FieldDescription>
+                <FieldError>{errors.videoUrl}</FieldError>
               </Field>
             </FieldGroup>
           </div>
 
           {/* Ingrédients - Section collapsible */}
-          <Collapsible
-            open={isIngredientsOpen}
+          <RecipeIngredientsEditor
+            ingredients={recipeIngredients}
+            availableIngredients={availableIngredients}
+            isLoadingIngredients={isLoadingIngredients}
+            isOpen={isIngredientsOpen}
+            errors={errors}
             onOpenChange={setIsIngredientsOpen}
-          >
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 p-6 rounded-xl">
-              <CollapsibleTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full flex justify-between items-center p-0 h-auto hover:bg-transparent"
-                >
-                  <h3 className="text-lg font-semibold flex items-center text-gray-800">
-                    <span className="mr-2">🥕</span>
-                    Ingrédients * ({recipeIngredients.length})
-                  </h3>
-                  <span className="text-xl">
-                    {isIngredientsOpen ? "🔽" : "▶️"}
-                  </span>
-                </Button>
-              </CollapsibleTrigger>
-
-              <CollapsibleContent className="mt-4">
-                <FieldError>{errors.ingredients}</FieldError>
-
-                <div className="space-y-3">
-                  {recipeIngredients.map((ingredient, index) => (
-                    <div
-                      key={ingredient.id}
-                      className="grid grid-cols-1 md:grid-cols-5 gap-3 p-4 bg-white border border-amber-200 rounded-lg"
-                    >
-                      <div className="md:col-span-2">
-                        <select
-                          value={ingredient.ingredientId}
-                          onChange={(e) =>
-                            handleIngredientChange(
-                              index,
-                              "ingredientId",
-                              e.target.value
-                            )
-                          }
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-amber-500"
-                          disabled={isLoadingIngredients}
-                        >
-                          <option value="">
-                            {isLoadingIngredients
-                              ? "Chargement..."
-                              : "Sélectionner"}
-                          </option>
-                          {availableIngredients.map((ing) => (
-                            <option key={ing.$id} value={ing.$id}>
-                              {ing.ingredientName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          value={ingredient.quantite}
-                          onChange={(e) =>
-                            handleIngredientChange(
-                              index,
-                              "quantite",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Qté"
-                          className="text-sm"
-                        />
-                      </div>
-
-                      <div>
-                        <select
-                          value={ingredient.uniteDeMesure}
-                          onChange={(e) =>
-                            handleIngredientChange(
-                              index,
-                              "uniteDeMesure",
-                              e.target.value
-                            )
-                          }
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-amber-500"
-                        >
-                          <option value="">Unité</option>
-                          <option value="g">g</option>
-                          <option value="kg">kg</option>
-                          <option value="ml">ml</option>
-                          <option value="l">l</option>
-                          <option value="cl">cl</option>
-                          <option value="cuillère à café">c. à café</option>
-                          <option value="cuillère à soupe">c. à soupe</option>
-                          <option value="tasse">tasse</option>
-                          <option value="pièce">pièce(s)</option>
-                          <option value="pincée">pincée</option>
-                        </select>
-                      </div>
-
-                      <div className="flex justify-center">
-                        {recipeIngredients.length > 1 && (
-                          <Button
-                            type="button"
-                            onClick={() => removeIngredient(index)}
-                            variant="outline"
-                            size="sm"
-                            className="text-red-600 border-red-300 hover:bg-red-50"
-                          >
-                            🗑️
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <Button
-                  type="button"
-                  onClick={addIngredient}
-                  variant="outline"
-                  className="mt-3 w-full border-amber-300 text-amber-700 hover:bg-amber-50"
-                >
-                  <span className="mr-2">+</span>
-                  Ajouter un ingrédient
-                </Button>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
+            onChange={handleIngredientChange}
+            onAdd={addIngredient}
+            onRemove={removeIngredient}
+          />
 
           {/* Actions */}
           <div className="flex justify-center space-x-4 pt-4">
@@ -503,8 +524,9 @@ const RecipeForm = ({ onRecipeCreated }) => {
                   difficulte: 1,
                   prix: "",
                   description: "",
-                  etapesPreparation: "",
+                  videoUrl: "",
                 });
+                setRecipeSteps([{ id: Date.now(), description: "" }]);
                 setRecipeIngredients([
                   {
                     id: Date.now(),

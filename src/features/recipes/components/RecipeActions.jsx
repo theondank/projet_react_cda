@@ -1,38 +1,31 @@
 import React from "react";
 import { Button } from "@ui/button";
+import { Heart, Share2, Edit, Printer } from "lucide-react";
 
 const RecipeActions = ({ onEdit, onShare, onPrint, onAddToFavorites }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Button
         onClick={onAddToFavorites}
-        className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white border-0 rounded-2xl py-4 shadow-lg transform hover:scale-105 transition-all duration-200"
+        variant="outline"
+        className="h-auto py-3"
       >
-        <span className="mr-2">❤️</span>
-        Ajouter aux favoris
+        <Heart className="w-4 h-4" />
+        Favoris
       </Button>
 
-      <Button
-        onClick={onShare}
-        className="bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white border-0 rounded-2xl py-4 shadow-lg transform hover:scale-105 transition-all duration-200"
-      >
-        <span className="mr-2">📤</span>
+      <Button onClick={onShare} variant="outline" className="h-auto py-3">
+        <Share2 className="w-4 h-4" />
         Partager
       </Button>
 
-      <Button
-        onClick={onEdit}
-        className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white border-0 rounded-2xl py-4 shadow-lg transform hover:scale-105 transition-all duration-200"
-      >
-        <span className="mr-2">✏️</span>
+      <Button onClick={onEdit} variant="default" className="h-auto py-3">
+        <Edit className="w-4 h-4" />
         Modifier
       </Button>
 
-      <Button
-        onClick={onPrint}
-        className="bg-gradient-to-r from-green-400 to-teal-400 hover:from-green-500 hover:to-teal-500 text-white border-0 rounded-2xl py-4 shadow-lg transform hover:scale-105 transition-all duration-200"
-      >
-        <span className="mr-2">🖨️</span>
+      <Button onClick={onPrint} variant="secondary" className="h-auto py-3">
+        <Printer className="w-4 h-4" />
         Imprimer
       </Button>
     </div>

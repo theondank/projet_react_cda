@@ -1,24 +1,15 @@
 import React, { useState } from "react";
 import { useRecipes } from "@context/recipeContext";
-import { MainLayout } from "@layouts/MainLayout";
-import {
-  PageCard,
-  SectionCard,
-  SectionTitle,
-} from "@ui/page-card";
-import { Button } from "@ui/button";
-import RecipeCard from "./RecipeCard";
-import RecipeDetail from "./RecipeDetail";
-import {
-  LoadingState,
-  ErrorState,
-  EmptyState,
-} from "@components/common";
+import RecipeCardModern from "./RecipeCardModern";
+import RecipeDetailModal from "./RecipeDetailModal";
+import { LoadingState, ErrorState, EmptyState } from "@components/common";
+import { Book } from "lucide-react";
 
 const RecipeList = () => {
   const { recipes, loading, error, refresh } = useRecipes();
   const [openRecipeId, setOpenRecipeId] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getRecipeId = (recipe) => {
     return recipe.$id || recipe.id || recipe.nom;
@@ -28,14 +19,15 @@ const RecipeList = () => {
     setOpenRecipeId(openRecipeId === recipeId ? null : recipeId);
   };
 
-  if (selectedRecipe) {
-    return (
-      <RecipeDetail
-        recipe={selectedRecipe}
-        onBack={() => setSelectedRecipe(null)}
-      />
-    );
-  }
+  const handleViewDetails = (recipe) => {
+    setSelectedRecipe(recipe);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecipe(null);
+  };
 
   if (loading) {
     return <LoadingState />;
@@ -46,48 +38,51 @@ const RecipeList = () => {
   }
 
   return (
-    <MainLayout
-      title="Recettes"
-      subtitle={`Découvrez ${recipes.length} création${
-        recipes.length > 1 ? "s" : ""
-      } culinaire${recipes.length > 1 ? "s" : ""}`}
-      icon="📚"
-    >
-      <PageCard>
-        <SectionCard gradient="from-amber-50 to-orange-50">
-          <SectionTitle icon="🍽️">Recettes créées avec amour</SectionTitle>
+    <div className="min-h-screen bg-neutral-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* En-tête moderne et épuré */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+            <Book className="w-6 h-6 inline-block mr-2" />
+            Toutes les Recettes
+          </h1>
+          <p className="text-neutral-600">
+            {recipes.length > 0
+              ? `Découvrez ${recipes.length} création${
+                  recipes.length > 1 ? "s" : ""
+                } culinaire${recipes.length > 1 ? "s" : ""}`
+              : "Aucune recette disponible"}
+          </p>
+        </div>
 
-          {recipes.length === 0 ? (
-            <EmptyState onRefresh={refresh} />
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {recipes.map((recipe, index) => {
-                const recipeId = getRecipeId(recipe);
-                return (
-                  <div key={recipeId || `recipe-${index}`} className="relative">
-                    <RecipeCard
-                      recipe={recipe}
-                      isExpanded={openRecipeId === recipeId}
-                      onToggleExpand={() => toggleEtapes(recipeId)}
-                    />
-                    <div className="mt-3 flex justify-center">
-                      <Button
-                        size="sm"
-                        onClick={() => setSelectedRecipe(recipe)}
-                        className="bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 text-white border-0 rounded-full transition-all duration-200 px-6"
-                      >
-                        <span className="mr-1">👁️</span>
-                        Voir les détails
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </SectionCard>
-      </PageCard>
-    </MainLayout>
+        {/* Contenu */}
+        {recipes.length === 0 ? (
+          <EmptyState onRefresh={refresh} />
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {recipes.map((recipe, index) => {
+              const recipeId = getRecipeId(recipe);
+              return (
+                <RecipeCardModern
+                  key={recipeId || `recipe-${index}`}
+                  recipe={recipe}
+                  isExpanded={openRecipeId === recipeId}
+                  onToggleExpand={() => toggleEtapes(recipeId)}
+                  onViewDetails={handleViewDetails}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Modale pour les détails de recette */}
+      <RecipeDetailModal
+        recipe={selectedRecipe}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </div>
   );
 };
 

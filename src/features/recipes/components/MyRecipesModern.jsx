@@ -1,13 +1,10 @@
-// Fichier : /src/components/pages/MesRecettes.jsx
-
 import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "@context/authContext";
 import { recetteAPI } from "../services";
 import RecipeCardModern from "./RecipeCardModern";
 import RecipeDetailModal from "./RecipeDetailModal";
-import { UtensilsCrossed, ChefHat } from "lucide-react";
 
-export default function MesRecettes() {
+export default function MyRecipesModern() {
   const { loggedInUser } = useContext(AuthContext);
   const [userRecipes, setUserRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +34,7 @@ export default function MesRecettes() {
     }
 
     fetchUserRecipes();
-  }, [loggedInUser]); // Se redéclenche si l'utilisateur change
+  }, [loggedInUser]);
 
   const toggleEtapes = (id) => {
     setOpenRecipeId(openRecipeId === id ? null : id);
@@ -53,63 +50,41 @@ export default function MesRecettes() {
     setSelectedRecipe(null);
   };
 
-  // État de chargement moderne
   if (isLoading) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-neutral-600 font-medium">
-            Chargement de vos recettes...
-          </p>
+          <p className="text-neutral-600">Chargement de vos recettes...</p>
         </div>
       </div>
     );
   }
 
-  // État d'erreur moderne
   if (fetchError) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
         <div className="max-w-md text-center">
           <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-red-600"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="15" y1="9" x2="9" y2="15" />
-              <line x1="9" y1="9" x2="15" y2="15" />
-            </svg>
+            <span className="text-3xl">⚠️</span>
           </div>
           <h2 className="text-xl font-semibold text-neutral-800 mb-2">
             Une erreur est survenue
           </h2>
-          <p className="text-neutral-600 mb-6">{fetchError}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors duration-200"
-          >
-            Réessayer
-          </button>
+          <p className="text-neutral-600">{fetchError}</p>
         </div>
       </div>
     );
   }
 
-  // Rendu principal avec design moderne et épuré
   return (
     <div className="min-h-screen bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* En-tête moderne */}
+        {/* En-tête */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2 flex items-center gap-3">
-            <UtensilsCrossed className="w-8 h-8 text-primary" />
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
             Mes Recettes
-          </h1> 
+          </h1>
           <p className="text-neutral-600">
             {userRecipes.length > 0
               ? `${userRecipes.length} recette${
@@ -119,11 +94,11 @@ export default function MesRecettes() {
           </p>
         </div>
 
-        {/* État vide moderne */}
+        {/* Contenu */}
         {userRecipes.length === 0 ? (
           <div className="max-w-md mx-auto text-center py-16">
             <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ChefHat className="w-10 h-10 text-neutral-400" />
+              <span className="text-5xl">🍳</span>
             </div>
             <h3 className="text-xl font-semibold text-neutral-800 mb-2">
               Aucune recette créée

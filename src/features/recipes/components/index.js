@@ -6,6 +6,11 @@ export { default as RecipeForm } from "./RecipeForm";
 export { default as RecipeCard } from "./RecipeCard";
 export { default as RecipeIngredients } from "./RecipeIngredients";
 
+// Composants de formulaire de recette
+export { default as RecipeBasicInfoFields } from "./RecipeBasicInfoFields";
+export { default as RecipeStepsEditor } from "./RecipeStepsEditor";
+export { default as RecipeIngredientsEditor } from "./RecipeIngredientsEditor";
+
 // Composants de détail de recette
 export { default as RecipeStats } from "./RecipeStats";
 export { default as RecipeDescription } from "./RecipeDescription";

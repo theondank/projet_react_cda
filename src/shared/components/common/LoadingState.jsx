@@ -1,21 +1,14 @@
 import React from "react";
-import { MainLayout } from "@layouts/MainLayout";
-import { PageCard } from "@ui/page-card";
 
-const LoadingState = () => {
+const LoadingState = ({ message = "Chargement des recettes..." }) => {
   return (
-    <MainLayout title="Recettes" subtitle="Chargement en cours..." icon="⏳">
-      <PageCard>
-        <div className="flex justify-center items-center p-12">
-          <div className="text-center">
-            <span className="text-4xl mb-4 block">⏳</span>
-            <div className="text-lg text-gray-600">
-              Chargement des recettes...
-            </div>
-          </div>
-        </div>
-      </PageCard>
-    </MainLayout>
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="text-center">
+        {/* Spinner moderne et épuré */}
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-neutral-600 font-medium">{message}</p>
+      </div>
+    </div>
   );
 };
 

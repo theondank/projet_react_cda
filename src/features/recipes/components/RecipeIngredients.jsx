@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecipes } from "@context/recipeContext";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 const RecipeIngredients = ({ recipeId }) => {
   const { getRecipeIngredients } = useRecipes();
@@ -32,9 +33,14 @@ const RecipeIngredients = ({ recipeId }) => {
     <div className="mt-4 mb-2">
       <button
         onClick={() => setShowIngredients(!showIngredients)}
-        className="text-gray-700 hover:text-gray-900 text-sm font-medium flex items-center"
+        className="text-gray-700 hover:text-gray-900 text-sm font-medium flex items-center gap-1"
       >
-        {showIngredients ? "🔽" : "▶️"} Ingrédients
+        {showIngredients ? (
+          <ChevronDown className="w-4 h-4" />
+        ) : (
+          <ChevronRight className="w-4 h-4" />
+        )}
+        Ingrédients
       </button>
 
       {showIngredients ? (

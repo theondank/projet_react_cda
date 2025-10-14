@@ -1,8 +1,8 @@
 import React from "react";
-import { MyRecipes } from "@features/recipes/components/MyRecipes";
+import { MyRecipes } from "@features/recipes/components/MyRecipesModern";
 
 const MyRecipesPage = () => {
-  return <MyRecipes />;
+  return <MyRecipesModern />;
 };
 
 export default MyRecipesPage;

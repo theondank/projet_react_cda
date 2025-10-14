@@ -1,8 +1,15 @@
 import React from "react";
+import { Clock, Gauge, DollarSign, Calendar } from "lucide-react";
 
-const getDifficultyEmoji = (level) => {
-  const emojis = { 1: "🟢", 2: "🟡", 3: "🟠", 4: "🔴", 5: "🟣" };
-  return emojis[level] || "⚪";
+const getDifficultyColor = (level) => {
+  const colors = {
+    1: "text-green-500",
+    2: "text-yellow-500",
+    3: "text-orange-500",
+    4: "text-red-500",
+    5: "text-purple-500",
+  };
+  return colors[level] || "text-neutral-400";
 };
 
 const getDifficultyText = (level) => {
@@ -18,37 +25,43 @@ const getDifficultyText = (level) => {
 
 const RecipeStats = ({ recipe }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-      <div className="bg-white rounded-2xl p-4 text-center shadow-md">
-        <div className="text-3xl mb-2">⏰</div>
-        <div className="text-xl font-bold text-orange-600">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="bg-white rounded-lg p-4 text-center border border-neutral-200">
+        <Clock className="w-8 h-8 mx-auto mb-2 text-primary" />
+        <div className="text-lg font-semibold text-neutral-800">
           {recipe.temps} min
         </div>
-        <div className="text-sm text-gray-600">Temps de préparation</div>
+        <div className="text-xs text-neutral-500 mt-1">
+          Temps de préparation
+        </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 text-center shadow-md">
-        <div className="text-3xl mb-2">
-          {getDifficultyEmoji(recipe.difficulte)}
-        </div>
-        <div className="text-xl font-bold text-red-600">
+      <div className="bg-white rounded-lg p-4 text-center border border-neutral-200">
+        <Gauge
+          className={`w-8 h-8 mx-auto mb-2 ${getDifficultyColor(
+            recipe.difficulte
+          )}`}
+        />
+        <div className="text-lg font-semibold text-neutral-800">
           {getDifficultyText(recipe.difficulte)}
         </div>
-        <div className="text-sm text-gray-600">Difficulté</div>
+        <div className="text-xs text-neutral-500 mt-1">Difficulté</div>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 text-center shadow-md">
-        <div className="text-3xl mb-2">💰</div>
-        <div className="text-xl font-bold text-green-600">{recipe.prix} €</div>
-        <div className="text-sm text-gray-600">Prix estimé</div>
+      <div className="bg-white rounded-lg p-4 text-center border border-neutral-200">
+        <DollarSign className="w-8 h-8 mx-auto mb-2 text-green-600" />
+        <div className="text-lg font-semibold text-neutral-800">
+          {recipe.prix} €
+        </div>
+        <div className="text-xs text-neutral-500 mt-1">Prix estimé</div>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 text-center shadow-md">
-        <div className="text-3xl mb-2">📅</div>
-        <div className="text-xl font-bold text-blue-600">
+      <div className="bg-white rounded-lg p-4 text-center border border-neutral-200">
+        <Calendar className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+        <div className="text-lg font-semibold text-neutral-800">
           {new Date(recipe.$createdAt).toLocaleDateString("fr-FR")}
         </div>
-        <div className="text-sm text-gray-600">Créée le</div>
+        <div className="text-xs text-neutral-500 mt-1">Créée le</div>
       </div>
     </div>
   );

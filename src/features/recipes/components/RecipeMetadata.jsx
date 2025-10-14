@@ -1,24 +1,29 @@
 import React from "react";
+import { Hash, Clock } from "lucide-react";
 
 const RecipeMetadata = ({ recipe }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="bg-white rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center mb-2">
-          <span className="text-purple-500 mr-2">🆔</span>
-          <span className="font-medium text-gray-700">ID de la recette</span>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+        <div className="flex items-center gap-2 mb-2">
+          <Hash className="w-5 h-5 text-neutral-500" />
+          <span className="font-medium text-neutral-700 text-sm">
+            ID de la recette
+          </span>
         </div>
-        <p className="text-gray-600 font-mono text-sm">{recipe.$id}</p>
+        <p className="text-neutral-600 font-mono text-xs break-all">
+          {recipe.$id}
+        </p>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center mb-2">
-          <span className="text-purple-500 mr-2">🕒</span>
-          <span className="font-medium text-gray-700">
+      <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+        <div className="flex items-center gap-2 mb-2">
+          <Clock className="w-5 h-5 text-neutral-500" />
+          <span className="font-medium text-neutral-700 text-sm">
             Dernière modification
           </span>
         </div>
-        <p className="text-gray-600">
+        <p className="text-neutral-600 text-sm">
           {new Date(recipe.$updatedAt).toLocaleDateString("fr-FR", {
             year: "numeric",
             month: "long",
